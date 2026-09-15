@@ -1,4 +1,6 @@
 {
+    Modified 2026-09-15 for this port: support the Android NDK LLD linker script.
+
     Copyright (c) 1998-2008 by Peter Vreman
 
     This unit implements support import,export,link routines
@@ -354,7 +356,8 @@ begin
       add('    KEEP (*(.fpc .fpc.n_version .fpc.n_links))');
       add('  }');
       add('}');
-      add('INSERT AFTER .data1');
+      { LLD's default script has .rodata but no .data1 section. }
+      add('INSERT AFTER .rodata');
 
       // Define different aliases for normal and JNI libraries
       if FJNIOnLoadName <> '' then

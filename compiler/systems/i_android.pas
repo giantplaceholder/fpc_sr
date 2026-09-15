@@ -1,4 +1,6 @@
 {
+    Modified 2026-09-15 for this port: select LLVM exception unwinding on Android ARM64.
+
     Copyright (c) 1998-2012 by Peter Vreman
 
     This unit implements support information structures for Android
@@ -175,7 +177,8 @@ unit i_android;
              flags        : [tf_needs_symbol_size,tf_needs_symbol_type,tf_files_case_sensitive,
                              tf_requires_proper_alignment, tf_safecall_exceptions,
                              tf_pic_uses_got, tf_pic_default,
-                             tf_smartlink_sections,tf_has_winlike_resources,tf_supports_hidden_symbols];
+                             tf_smartlink_sections,tf_has_winlike_resources,tf_supports_hidden_symbols
+                             {$ifdef llvm},tf_use_psabieh{$endif}];
              cpu          : cpu_aarch64;
              unit_env     : 'ANDROIDUNITS';
              extradefines : 'UNIX;HASUNIX';

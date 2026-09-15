@@ -1,4 +1,6 @@
 {
+    Modified 2026-09-15 for this port: leave LLVM unwind-table generation to LLVM.
+
     Copyright (c) 2003-2004 by Peter Vreman and Florian Klaempfl
 
     This units contains special support for DWARF debug info
@@ -238,6 +240,11 @@ implementation
     constructor TDwarfAsmCFI.create;
       begin
         inherited;
+{$ifdef llvm}
+        { LLVM emits unwind tables after instruction selection and register
+          allocation. FPC's tables describe the pre-LLVM instruction stream. }
+        datatype:=dt_none;
+{$else llvm}
         if tf_use_psabieh in target_info.flags then
           datatype:=dt_eh_frame
         else
@@ -246,6 +253,7 @@ implementation
             and during linking it can be omitted or not, based on the debug
             settings. }
           datatype:=dt_debug;
+{$endif llvm}
       end;
 
 {****************************************************************************

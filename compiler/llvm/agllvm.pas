@@ -1,4 +1,6 @@
 {
+    Modified 2026-09-15 for this port: enable Android ARM64 LLVM output.
+
     Copyright (c) 1998-2013 by the Free Pascal team
 
     This unit implements the generic part of the LLVM IR writer
@@ -1790,7 +1792,7 @@ implementation
           idtxt  : 'CLANG-LLVM';
           asmbin : 'clang';
           asmcmd: '-x ir $OPT -target $TRIPLET -c -o $OBJ $ASM $EXTRAOPT';
-          supported_targets : [system_x86_64_linux,system_aarch64_linux,system_arm_linux,system_x86_64_openbsd,system_x86_64_freebsd];
+          supported_targets : [system_x86_64_linux,system_aarch64_linux,system_arm_linux,system_x86_64_openbsd,system_x86_64_freebsd,system_aarch64_android];
           flags : [af_smartlink_sections,af_llvm];
           labelprefix : '.L';
           labelmaxlen : -1;

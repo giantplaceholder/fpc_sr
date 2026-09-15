@@ -1,4 +1,6 @@
 {
+    Modified 2026-09-15 for this port: link Android NDK libunwind.
+
     This file is part of the Free Pascal run time library.
     Translated to Pascal by Jonas Maebe,
     member of the Free Pascal development team
@@ -47,6 +49,11 @@
 {$ifdef linux}
 {$linklib c}
 {$linklib libgcc_s}
+{$endif}
+
+{$ifdef android}
+{$linklib c}
+{$linklib unwind}
 {$endif}
 
 {$ifdef __ARM_EABI_UNWINDER__}
