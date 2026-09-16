@@ -107,5 +107,6 @@ units
 /tests/utils/fptime
 /tests/utils/testfail
 bin/
+/.local/
 fpmake
 packages/fcl-db/tests/database.ini
