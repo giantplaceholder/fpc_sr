@@ -1026,8 +1026,22 @@ implementation
         end;
 
 
-      procedure WriteFunctionFlags(pd: tprocdef);
+      procedure WriteFunctionFlags(pd: tprocdef; is_definition: boolean);
+{$ifdef aarch64}
+        const
+          archfeatures: array[tcputype] of string[8] =
+            ('', '+v8a', '+v8a', '+v8.1a', '+v8.2a', '+v8.3a', '+v8.4a',
+             '+v8.5a', '+v8.6a', '+v8.7a', '+v8.8a', '+v8.9a');
+{$endif aarch64}
         begin
+{$ifdef aarch64}
+          { clang's -march option controls code generation, but does not
+            preserve the architecture in bitcode assembled from LLVM IR.
+            LTO needs it on each definition, including assembler routines.
+            A declaration may refer to a unit built for another architecture. }
+          if is_definition and (archfeatures[current_settings.cputype]<>'') then
+            writer.AsmWrite(' "target-features"="'+archfeatures[current_settings.cputype]+'"');
+{$endif aarch64}
           { function attributes }
           if (pos('FPC_SETJMP',upper(pd.mangledname))<>0) or
              (pd.mangledname=(target_info.cprefix+'setjmp')) then
@@ -1374,7 +1388,7 @@ implementation
                     begin
                       writer.AsmWrite('declare');
                       writer.AsmWrite(llvmencodeproctype(tprocdef(taillvmdecl(hp).def), taillvmdecl(hp).namesym.name, lpd_decl));
-                      WriteFunctionFlags(tprocdef(taillvmdecl(hp).def));
+                      WriteFunctionFlags(tprocdef(taillvmdecl(hp).def),false);
                       writer.AsmLn;
                     end
                   else
@@ -1384,7 +1398,7 @@ implementation
                         writer.AsmWrite(' weak');
                       WriteLinkageVibilityFlags(taillvmdecl(hp).namesym.bind, true);
                       writer.AsmWrite(llvmencodeproctype(tprocdef(taillvmdecl(hp).def), '', lpd_def));
-                      WriteFunctionFlags(tprocdef(taillvmdecl(hp).def));
+                      WriteFunctionFlags(tprocdef(taillvmdecl(hp).def),true);
                       if assigned(tprocdef(taillvmdecl(hp).def).personality) then
                         begin
                           if not(llvmflag_opaque_ptr in llvmversion_properties[current_settings.llvmversion]) then
