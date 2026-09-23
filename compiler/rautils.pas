@@ -1380,16 +1380,14 @@ begin
      absolutevarsym:
        AddAbsoluteSymRefs(tabsolutevarsym(sym));
      staticvarsym:
-       if not(vo_is_external in tstaticvarsym(sym).varoptions) then
-         cnodeutils.RegisterUsedAsmSym(current_asmdata.RefAsmSymbol(sym.mangledname,AT_DATA),tstaticvarsym(sym).vardef,true);
+       cnodeutils.RegisterUsedAsmSym(current_asmdata.RefAsmSymbol(sym.mangledname,AT_DATA),tstaticvarsym(sym).vardef,true);
      procsym:
        begin
-         { if it's a pure assembler routine, the definition of the symbol will also
-           be in assembler and it can't be removed by the compiler (and if we mark
-           it as used anyway, clang will get into trouble) }
-         if not(po_assembler in tprocdef(tprocsym(sym).ProcdefList[0]).procoptions) and
-            not(po_external in tprocdef(tprocsym(sym).ProcdefList[0]).procoptions) then
-           cnodeutils.RegisterUsedAsmSym(current_asmdata.RefAsmSymbol(tprocdef(tprocsym(sym).ProcdefList[0]).mangledname,AT_FUNCTION),tprocdef(tprocsym(sym).ProcdefList[0]),true);
+         { LLVM represents assembler routines as functions containing inline asm.
+           References from asm are invisible to its optimiser, including references
+           through external/public aliases. Keep them in llvm.compiler.used so LTO
+           cannot discard or rename their definitions. The native hook is empty. }
+         cnodeutils.RegisterUsedAsmSym(current_asmdata.RefAsmSymbol(tprocdef(tprocsym(sym).ProcdefList[0]).mangledname,AT_FUNCTION),tprocdef(tprocsym(sym).ProcdefList[0]),true);
        end;
      else
        ;

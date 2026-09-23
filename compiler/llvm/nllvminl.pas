@@ -412,7 +412,9 @@ implementation
     procedure tllvminlinenode.second_sqr_real;
       begin
         secondpass(left);
-        location.loc:=expectloc;
+        { Consumers need the result size, in particular when converting an
+          extended square to an SSE-sized argument on x86. }
+        location_reset(location,expectloc,def_cgsize(resultdef));
         if expectloc=LOC_MMREGISTER then
           begin
             hlcg.location_force_mmregscalar(current_asmdata.CurrAsmList,left.location,left.resultdef,true);

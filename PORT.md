@@ -13,6 +13,21 @@ compiler, runtime library, and the `rtl-objpas`, `fcl-base`, `fcl-process`, and
 
 ## Local changes
 
+- [LLVM assembly references](compiler/rautils.pas): record references to assembler
+  routines and external aliases in `llvm.compiler.used`. Assembler routines are
+  now LLVM functions containing inline assembly; excluding them let LTO delete
+  startup and memory-fill helpers. External aliases need the same treatment for
+  functions and variables. `tests/test/tllvmasmrefs.pp` reproduces all three cases.
+
+- [LLVM Sqr](compiler/llvm/nllvminl.pas): initialize the complete result location,
+  including its size, so narrowing an extended square to a Double argument
+  does not try to allocate an 80-bit SSE register (internal error 200301231).
+
+- [x86 Include/Exclude](compiler/x86/nx86inl.pas): adjust nonzero set bases
+  using the converted bit-index register type. Using the original ordinal type
+  after widening the register caused internal error 200306031 in Delphi-mode
+  small sets (for example `set of 8..39`).
+
 - [LLVM assembler targets](compiler/llvm/agllvm.pas): enable Android ARM64.
 - [Android target](compiler/systems/i_android.pas): select LLVM's exception
   unwinding convention.
